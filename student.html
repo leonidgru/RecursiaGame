@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>הצטרפות לחידון הכיתתי | מדעי המחשב א' (C#)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+  <script>
+    window.FORCE_STUDENT_MODE = true;
+  </script>
+</head>
+<body class="student-only-body">
+  <!-- =========================================================
+       מסך 1 לתלמיד: הזנת שם והתחברות לחדר של המורה בלבד
+       ========================================================= -->
+  <main id="studentJoinView" class="student-join-screen">
+    <div class="student-join-card">
+      <div class="student-join-header">
+        <span class="student-room-pill">כיתה מחוברת: <strong id="joinScreenRoomCode">3H3T</strong></span>
+        <h1>📱 הצטרפות לחידון הכיתתי</h1>
+        <p>הזינו את שמכם כדי להתחבר למשחק שהמורה מפעיל כעת על הלוח</p>
+      </div>
+
+      <form id="studentJoinForm" class="student-join-form">
+        <input type="hidden" id="inputRoomCode" value="3H3T" />
+        <div class="form-group">
+          <label for="inputStudentName">השם שלך (יוצג בטבלת הניקוד):</label>
+          <input type="text" id="inputStudentName" maxlength="20" placeholder="הכנס/י שם פרטי..." autocomplete="off" required />
+        </div>
+        <div class="form-group">
+          <label>בחר/י דמות:</label>
+          <div class="avatar-picker" id="avatarPicker">
+            <button type="button" class="avatar-btn selected" data-avatar="🦊">🦊</button>
+            <button type="button" class="avatar-btn" data-avatar="🦁">🦁</button>
+            <button type="button" class="avatar-btn" data-avatar="🐼">🐼</button>
+            <button type="button" class="avatar-btn" data-avatar="🐯">🐯</button>
+            <button type="button" class="avatar-btn" data-avatar="🐸">🐸</button>
+            <button type="button" class="avatar-btn" data-avatar="🦄">🦄</button>
+            <button type="button" class="avatar-btn" data-avatar="🐙">🐙</button>
+            <button type="button" class="avatar-btn" data-avatar="🚀">🚀</button>
+          </div>
+        </div>
+        <button type="submit" class="primary-indigo-btn large-btn full-width">
+          🎯 התחבר למשחק!
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <!-- =========================================================
+       מסך 2 לתלמיד: מענה על השאלות במשחק שהמורה בחר
+       ========================================================= -->
+  <main id="studentPlayView" class="student-view-container hidden">
+    <div class="student-top-strip">
+      <div class="student-profile-chip">
+        <span id="studentAvatarDisplay">🦊</span>
+        <strong id="studentNameDisplay">תלמיד</strong>
+      </div>
+      <div class="student-room-chip">
+        חדר: <strong id="studentRoomDisplay">3H3T</strong>
+      </div>
+      <div class="student-score-chip">
+        ⭐ <strong id="studentScoreDisplay">0</strong> נק'
+        <span class="streak-pill hidden" id="studentStreakPill">🔥 0</span>
+      </div>
+    </div>
+
+    <div class="student-question-card">
+      <div class="student-q-meta">
+        <span id="studentQNumber">שאלה 1 מתוך 20</span>
+        <span id="studentQTopic">לולאות for מקוננות</span>
+      </div>
+
+      <h2 class="student-q-title" id="studentQTitle">מתחבר לשאלה שעל לוח המורה...</h2>
+
+      <div class="csharp-code-wrapper student-code hidden" id="studentCodeWrapper" dir="ltr">
+        <pre class="csharp-code-pre"><code id="studentCodeContent"></code></pre>
+      </div>
+
+      <div class="student-options-grid" id="studentOptionsGrid">
+        <button type="button" class="student-ans-btn ans-a" data-index="0">
+          <span class="ans-badge">א</span>
+          <span class="ans-label" id="studentOpt0">אפשרות א</span>
+        </button>
+        <button type="button" class="student-ans-btn ans-b" data-index="1">
+          <span class="ans-badge">ב</span>
+          <span class="ans-label" id="studentOpt1">אפשרות ב</span>
+        </button>
+        <button type="button" class="student-ans-btn ans-c" data-index="2">
+          <span class="ans-badge">ג</span>
+          <span class="ans-label" id="studentOpt2">אפשרות ג</span>
+        </button>
+        <button type="button" class="student-ans-btn ans-d" data-index="3">
+          <span class="ans-badge">ד</span>
+          <span class="ans-label" id="studentOpt3">אפשרות ד</span>
+        </button>
+      </div>
+
+      <div class="student-feedback-box hidden" id="studentFeedbackBox">
+        <div class="feedback-emoji" id="studentFeedbackEmoji">⏳</div>
+        <h3 id="studentFeedbackTitle">התשובה נשלחה!</h3>
+        <p id="studentFeedbackSub">ממתין שהמורה יחשוף את התשובה על הלוח...</p>
+      </div>
+    </div>
+  </main>
+
+  <script src="https://unpkg.com/mqtt@5.3.4/dist/mqtt.min.js"></script>
+  <script src="questions.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

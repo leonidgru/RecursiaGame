@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>חידון כיתתי | לולאות for מקוננות בשפת C# - כיתה י'</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- קנבס קונפטי לסיום המשחק וטבלת המובילים -->
+  <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+
+  <!-- =========================================================
+       סרגל עליון – למורה בלבד! (מוסתר לחלוטין אצל תלמידים)
+       ========================================================= -->
+  <header class="top-navbar teacher-only" id="topNavbar">
+    <div class="nav-right">
+      <span class="brand-main">חידון כיתתי</span>
+      <span class="brand-sub" id="brandSubTitle">יחידה 6 – לולאות for מקוננות (C#)</span>
+      <!-- בורר משחקים למורה בלבד -->
+      <div class="game-switcher-pills" role="group" aria-label="בחירת משחק (למורה)">
+        <button type="button" class="game-switch-btn active" data-game="1" id="btnSwitchGame1">
+          משחק 1: for מקוננות (20)
+        </button>
+        <button type="button" class="game-switch-btn" data-game="2" id="btnSwitchGame2">
+          משחק 2: for מקוננות (20)
+        </button>
+        <button type="button" class="game-switch-btn" data-game="3" id="btnSwitchGame3">
+          משחק 3: רקורסיה י"א (15)
+        </button>
+      </div>
+    </div>
+
+    <div class="nav-left">
+      <div class="nav-pill status-pill" id="connectionPill" title="מצב חיבור הלוח הכיתתי">
+        <span class="status-dot online" id="statusDot"></span>
+        <span id="statusText">הלוח מחובר</span>
+      </div>
+
+      <button type="button" class="nav-pill clickable-pill" id="btnConnectedPlayers" title="צפייה בתלמידים מחוברים וטבלת ניקוד">
+        <span id="connectedCountLabel">0 מחוברים</span>
+      </button>
+
+      <button type="button" class="nav-pill clickable-pill" id="btnHome" title="מעבר לדף הבית של המורה">
+        דף הבית
+      </button>
+
+      <button type="button" class="nav-pill clickable-pill" id="btnFullscreen" title="מעבר למסך מלא">
+        מסך מלא
+      </button>
+    </div>
+  </header>
+
+  <!-- =========================================================
+       מסך מורה 1: דף הבית / הגדרות משחק ולובי המתנה (למורה בלבד!)
+       ========================================================= -->
+  <main id="homeView" class="view-container teacher-only hidden">
+    <div class="lobby-card">
+      <div class="lobby-header">
+        <span class="lobby-badge">מסך ניהול מורה • מדעי המחשב א' • כיתה י' (C#)</span>
+        <h1>🎮 ניהול חידון כיתתי: לולאות <code>for</code> מקוננות</h1>
+        <p>בחרו איזה משחק להפעיל לכיתה – התלמידים שסורקים את ה-QR יחוברו אוטומטית למשחק שבחרתם</p>
+      </div>
+
+      <!-- בחירת משחק (למורה בלבד!) -->
+      <div class="lobby-game-selector">
+        <button type="button" class="lobby-game-card active" data-game="1" id="lobbyCardGame1">
+          <strong>🎯 משחק 1 (כיתה י') – לולאות for מקוננות (20 שאלות)</strong>
+          <span>יסודות, איטרציות, הדפסת שורות ועמודות, משולשים, לוח הכפל וראשוניים</span>
+        </button>
+        <button type="button" class="lobby-game-card" data-game="2" id="lobbyCardGame2">
+          <strong>🔥 משחק 2 (כיתה י') – אתגרי for מקוננות (20 שאלות)</strong>
+          <span>תבנית שחמט, אלכסון משני, פקודת continue, חזקות ומספרים משוכללים</span>
+        </button>
+        <button type="button" class="lobby-game-card" data-game="3" id="lobbyCardGame3">
+          <strong>🧠 משחק 3 (כיתה י"א) – רקורסיה בשפת C# (15 שאלות)</strong>
+          <span>תנאי עצירה, מעקב מחסנית, פירוק מספרים, רקורסיה על מערכים, מחרוזות ופיבונאצ'י</span>
+        </button>
+      </div>
+
+      <div id="teacherLobbyPanel" class="lobby-panel">
+        <div class="lobby-grid">
+          <!-- כרטיס קוד כיתה ו-QR לתלמידים -->
+          <div class="room-Join-box">
+            <div class="room-code-label">ברקוד הצטרפות לתלמידים בלבד:</div>
+            <div class="room-code-big" id="lobbyRoomCode">3H3T</div>
+            <div class="qr-lobby-wrapper" id="lobbyQrContainer" title="סריקה מהטלפון מובילה ישירות למסך תלמיד"></div>
+            <div class="qr-url-preview" id="lobbyJoinUrlText" dir="ltr"></div>
+            <p class="room-join-hint">כשאר התלמידים סורקים את הברקוד, נפתח להם <strong>מסך תלמיד בלבד</strong> המחובר אוטומטית למשחק שהמורה בחר</p>
+            <div class="lobby-quick-actions">
+              <button type="button" class="secondary-pill-btn small-btn" id="btnOpenStudentTab" title="פותח חלון תלמיד לבדיקה מהירה">
+                ➕ פתח מסך תלמיד בחלון חדש (לבדיקה)
+              </button>
+              <button type="button" class="secondary-pill-btn small-btn" id="btnAddDemoStudents" title="מוסיף תלמידים וירטואליים להדגמת התחרות">
+                🤖 הוסף תלמידי דמו
+              </button>
+            </div>
+          </div>
+
+          <!-- רשימת תלמידים מחוברים והגדרות משחק -->
+          <div class="players-waiting-box">
+            <div class="players-box-header">
+              <h3>👥 תלמידים מחוברים (<span id="lobbyPlayersCount">0</span>)</h3>
+              <button type="button" class="text-link-btn" id="btnClearPlayers">איפוס רשימה</button>
+            </div>
+
+            <div id="lobbyPlayersList" class="players-chips-grid">
+              <div class="empty-players-msg">
+                ממתין להצטרפות תלמידים...<br/>
+                <small>תלמידים סורקים את ה-QR בפינת המסך ומצטרפים ישירות למשחק שבחרתם!</small>
+              </div>
+            </div>
+
+            <div class="lobby-settings-row">
+              <label for="timerSelect">⏱️ מד זמן לשאלה:</label>
+              <select id="timerSelect" class="clean-select">
+                <option value="0" selected>ללא הגבלת זמן (קצב מורה)</option>
+                <option value="30">30 שניות לשאלה</option>
+                <option value="45">45 שניות לשאלה</option>
+                <option value="60">60 שניות לשאלה</option>
+              </select>
+            </div>
+
+            <div class="lobby-start-actions">
+              <button type="button" class="primary-indigo-btn large-btn" id="btnStartQuiz">
+                🚀 התחל משחק מההתחלה
+              </button>
+              <button type="button" class="secondary-pill-btn" id="btnResumeQuiz">
+                חזרה לשאלה הנוכחית בלוח
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- =========================================================
+       מסך מורה 2: הלוח הכיתתי (תואם במדויק לתמונה שהועלתה!)
+       ========================================================= -->
+  <main id="teacherQuizView" class="quiz-board-container teacher-only">
+    <!-- שורת התקדמות עליונה: פסי התקדמות מימין, ותגית "שאלה X מתוך 20" משמאל -->
+    <div class="board-progress-row">
+      <div class="progress-segments" id="progressSegments" aria-label="התקדמות בשאלות החידון">
+        <!-- 20 סגמנטים נוצרים דינמית ב-JS -->
+      </div>
+
+      <div class="question-header-pills">
+        <div class="timer-pill hidden" id="boardTimerPill">
+          ⏱️ <span id="boardTimerText">30</span> שניות
+        </div>
+        <div class="question-counter-pill" id="questionCounterPill">
+          שאלה 1 מתוך 20
+        </div>
+      </div>
+    </div>
+
+    <!-- כותרת נושא ושאלה -->
+    <section class="question-header-section">
+      <div class="question-topic-tag" id="questionTopicTag">לולאות for מקוננות</div>
+      <h1 class="question-main-title" id="questionMainTitle">
+        טוען שאלה...
+      </h1>
+
+      <!-- בלוק קוד C# (מוצג בשאלות הכוללות קטע קוד) -->
+      <div class="csharp-code-wrapper hidden" id="codeBlockWrapper" dir="ltr">
+        <div class="code-window-bar">
+          <div class="window-dots">
+            <span class="dot red"></span>
+            <span class="dot yellow"></span>
+            <span class="dot green"></span>
+          </div>
+          <span class="code-lang-label">C# • Program.cs</span>
+        </div>
+        <pre class="csharp-code-pre"><code id="questionCodeContent"></code></pre>
+      </div>
+    </section>
+
+    <!-- רשת 4 תשובות (א, ב, ג, ד) בדיוק כמו בתמונה -->
+    <section class="options-grid" id="boardOptionsGrid" aria-label="אפשרויות תשובה">
+      <!-- כרטיס א -->
+      <div class="option-card" data-index="0" id="optionCard0">
+        <div class="option-letter-badge badge-a">א</div>
+        <div class="option-content-wrap">
+          <div class="option-text" id="optionText0">אפשרות א</div>
+          <div class="option-stats-bar hidden" id="optionStats0">
+            <span class="votes-count" id="votesCount0">0 קולות</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- כרטיס ב -->
+      <div class="option-card" data-index="1" id="optionCard1">
+        <div class="option-letter-badge badge-b">ב</div>
+        <div class="option-content-wrap">
+          <div class="option-text" id="optionText1">אפשרות ב</div>
+          <div class="option-stats-bar hidden" id="optionStats1">
+            <span class="votes-count" id="votesCount1">0 קולות</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- כרטיס ג -->
+      <div class="option-card" data-index="2" id="optionCard2">
+        <div class="option-letter-badge badge-c">ג</div>
+        <div class="option-content-wrap">
+          <div class="option-text" id="optionText2">אפשרות ג</div>
+          <div class="option-stats-bar hidden" id="optionStats2">
+            <span class="votes-count" id="votesCount2">0 קולות</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- כרטיס ד -->
+      <div class="option-card" data-index="3" id="optionCard3">
+        <div class="option-letter-badge badge-d">ד</div>
+        <div class="option-content-wrap">
+          <div class="option-text" id="optionText3">אפשרות ד</div>
+          <div class="option-stats-bar hidden" id="optionStats3">
+            <span class="votes-count" id="votesCount3">0 קולות</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- תיבת הסבר פדגוגי (מוצגת לאחר חשיפת התשובה) -->
+    <section class="explanation-banner hidden" id="explanationBanner">
+      <div class="explanation-icon">💡</div>
+      <div class="explanation-body">
+        <strong>הסבר התשובה:</strong>
+        <span id="explanationText"></span>
+      </div>
+    </section>
+
+    <!-- שורת פעולות תחתונה: מונה עונים מימין, כפתורי "חשיפת התשובה" ו"דילוג על השאלה" משמאל -->
+    <footer class="board-controls-row">
+      <div class="answered-status">
+        <strong id="answeredRatioText">0 / 0</strong>
+        <span class="answered-sub">ענו עד כה</span>
+      </div>
+
+      <div class="board-action-buttons">
+        <button type="button" class="primary-indigo-btn" id="btnRevealOrNext">
+          חשיפת התשובה
+        </button>
+        <button type="button" class="secondary-pill-btn" id="btnLeaderboardQuick">
+          🏆 טבלת ניקוד
+        </button>
+        <button type="button" class="secondary-pill-btn" id="btnSkipQuestion">
+          דילוג על השאלה
+        </button>
+      </div>
+    </footer>
+  </main>
+
+  <!-- =========================================================
+       ווידג'ט QR קבוע בפינה השמאלית התחתונה (למורה בלבד!)
+       ========================================================= -->
+  <aside class="floating-qr-card teacher-only" id="floatingQrCard" title="סרקו מהטלפון להצטרפות ישירה כתלמיד">
+    <div class="floating-qr-box" id="floatingQrBox"></div>
+    <div class="floating-room-code" id="floatingRoomCode">3H3T</div>
+    <div class="floating-qr-caption">הצטרפות מאוחרת</div>
+  </aside>
+
+  <!-- =========================================================
+       מסך תלמיד 1: כניסת תלמיד בלבד (ללא שום אלמנט מורה וללא בחירת משחק!)
+       ========================================================= -->
+  <main id="studentJoinView" class="student-join-screen hidden">
+    <div class="student-join-card">
+      <div class="student-join-header">
+        <span class="student-room-pill">כיתה מחוברת: <strong id="joinScreenRoomCode">3H3T</strong></span>
+        <h1>📱 הצטרפות לחידון הכיתתי</h1>
+        <p>הזינו את שמכם כדי להתחבר למשחק שהמורה מפעיל כעת על הלוח</p>
+      </div>
+
+      <form id="studentJoinForm" class="student-join-form">
+        <input type="hidden" id="inputRoomCode" value="3H3T" />
+        <div class="form-group">
+          <label for="inputStudentName">השם שלך (יוצג בטבלת הניקוד):</label>
+          <input type="text" id="inputStudentName" maxlength="20" placeholder="הכנס/י שם פרטי..." autocomplete="off" required />
+        </div>
+        <div class="form-group">
+          <label>בחר/י דמות:</label>
+          <div class="avatar-picker" id="avatarPicker">
+            <button type="button" class="avatar-btn selected" data-avatar="🦊">🦊</button>
+            <button type="button" class="avatar-btn" data-avatar="🦁">🦁</button>
+            <button type="button" class="avatar-btn" data-avatar="🐼">🐼</button>
+            <button type="button" class="avatar-btn" data-avatar="🐯">🐯</button>
+            <button type="button" class="avatar-btn" data-avatar="🐸">🐸</button>
+            <button type="button" class="avatar-btn" data-avatar="🦄">🦄</button>
+            <button type="button" class="avatar-btn" data-avatar="🐙">🐙</button>
+            <button type="button" class="avatar-btn" data-avatar="🚀">🚀</button>
+          </div>
+        </div>
+        <button type="submit" class="primary-indigo-btn large-btn full-width">
+          🎯 התחבר למשחק!
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <!-- =========================================================
+       מסך תלמיד 2: שלט המשחק של התלמיד (מחובר אוטומטית למשחק של המורה)
+       ========================================================= -->
+  <main id="studentPlayView" class="student-view-container hidden">
+    <div class="student-top-strip">
+      <div class="student-profile-chip">
+        <span id="studentAvatarDisplay">🦊</span>
+        <strong id="studentNameDisplay">תלמיד</strong>
+      </div>
+      <div class="student-room-chip">
+        חדר: <strong id="studentRoomDisplay">3H3T</strong>
+      </div>
+      <div class="student-score-chip">
+        ⭐ <strong id="studentScoreDisplay">0</strong> נק'
+        <span class="streak-pill hidden" id="studentStreakPill">🔥 0</span>
+      </div>
+    </div>
+
+    <div class="student-question-card">
+      <div class="student-q-meta">
+        <span id="studentQNumber">שאלה 1 מתוך 20</span>
+        <span id="studentQTopic">לולאות for מקוננות</span>
+      </div>
+
+      <h2 class="student-q-title" id="studentQTitle">מתחבר לשאלה שעל לוח המורה...</h2>
+
+      <div class="csharp-code-wrapper student-code hidden" id="studentCodeWrapper" dir="ltr">
+        <pre class="csharp-code-pre"><code id="studentCodeContent"></code></pre>
+      </div>
+
+      <!-- 4 כפתורי תשובה גדולים לתלמיד -->
+      <div class="student-options-grid" id="studentOptionsGrid">
+        <button type="button" class="student-ans-btn ans-a" data-index="0">
+          <span class="ans-badge">א</span>
+          <span class="ans-label" id="studentOpt0">אפשרות א</span>
+        </button>
+        <button type="button" class="student-ans-btn ans-b" data-index="1">
+          <span class="ans-badge">ב</span>
+          <span class="ans-label" id="studentOpt1">אפשרות ב</span>
+        </button>
+        <button type="button" class="student-ans-btn ans-c" data-index="2">
+          <span class="ans-badge">ג</span>
+          <span class="ans-label" id="studentOpt2">אפשרות ג</span>
+        </button>
+        <button type="button" class="student-ans-btn ans-d" data-index="3">
+          <span class="ans-badge">ד</span>
+          <span class="ans-label" id="studentOpt3">אפשרות ד</span>
+        </button>
+      </div>
+
+      <!-- חיווי המתנה / תוצאה לתלמיד -->
+      <div class="student-feedback-box hidden" id="studentFeedbackBox">
+        <div class="feedback-emoji" id="studentFeedbackEmoji">⏳</div>
+        <h3 id="studentFeedbackTitle">התשובה נשלחה!</h3>
+        <p id="studentFeedbackSub">ממתין שהמורה יחשוף את התשובה על הלוח...</p>
+      </div>
+    </div>
+  </main>
+
+  <!-- =========================================================
+       מודאל טבלת מובילים ופודיום מנצחים (למורה בלבד!)
+       ========================================================= -->
+  <div class="modal-backdrop teacher-only hidden" id="leaderboardModal">
+    <div class="modal-card leaderboard-modal-card">
+      <div class="modal-header">
+        <h2 id="leaderboardModalTitle">🏆 טבלת מובילים כיתתית</h2>
+        <button type="button" class="close-modal-btn" id="btnCloseLeaderboard">✕</button>
+      </div>
+
+      <div class="podium-section" id="podiumSection">
+        <div class="podium-col second-place">
+          <div class="podium-avatar" id="podium2Avatar">🥈</div>
+          <div class="podium-name" id="podium2Name">—</div>
+          <div class="podium-score" id="podium2Score">0 נק'</div>
+          <div class="podium-pillar">2</div>
+        </div>
+        <div class="podium-col first-place">
+          <div class="crown-icon">👑</div>
+          <div class="podium-avatar" id="podium1Avatar">🥇</div>
+          <div class="podium-name" id="podium1Name">—</div>
+          <div class="podium-score" id="podium1Score">0 נק'</div>
+          <div class="podium-pillar">1</div>
+        </div>
+        <div class="podium-col third-place">
+          <div class="podium-avatar" id="podium3Avatar">🥉</div>
+          <div class="podium-name" id="podium3Name">—</div>
+          <div class="podium-score" id="podium3Score">0 נק'</div>
+          <div class="podium-pillar">3</div>
+        </div>
+      </div>
+
+      <div class="rankings-list" id="rankingsList"></div>
+
+      <div class="modal-footer">
+        <button type="button" class="secondary-pill-btn" id="btnAddDemoFromModal">
+          🤖 הוסף תלמידי דמו לתחרות
+        </button>
+        <button type="button" class="primary-indigo-btn" id="btnContinueFromLeaderboard">
+          המשך בחידון
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- מודאל הגדלת ברקוד הצטרפות לתלמידים (למורה בלבד!) -->
+  <div class="modal-backdrop teacher-only hidden" id="qrJoinModal">
+    <div class="modal-card qr-modal-card">
+      <div class="modal-header">
+        <h2>📱 סריקת QR להצטרפות תלמידים</h2>
+        <button type="button" class="close-modal-btn" id="btnCloseQrModal">✕</button>
+      </div>
+      <div class="qr-modal-body">
+        <div class="qr-modal-code-badge" id="modalRoomCode">3H3T</div>
+        <div class="qr-modal-box" id="modalQrBox"></div>
+        <div class="qr-url-preview" id="modalJoinUrlText" dir="ltr"></div>
+        <p class="qr-modal-instructions">
+          התלמידים סורקים את הברקוד במצלמת הטלפון ומגיעים ישירות למסך כניסת תלמיד עבור המשחק הנוכחי שבחרתם:
+        </p>
+        <div class="qr-modal-actions">
+          <button type="button" class="primary-indigo-btn" id="btnModalOpenStudent">
+            📱 פתח מסך תלמיד בחלון חדש (לבדיקה)
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MQTT over WebSockets לסנכרון בזמן אמת בין מכשירים + מחולל QR תקני -->
+  <script src="https://unpkg.com/mqtt@5.3.4/dist/mqtt.min.js"></script>
+  <script src="qrcode.js"></script>
+  <script src="questions.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
